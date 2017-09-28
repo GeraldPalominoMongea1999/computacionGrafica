@@ -3,6 +3,7 @@ from math import radians
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
+import sys
 import pygame
 from pygame.locals import *
 import time
@@ -72,6 +73,43 @@ def rotar(angulo,v ):
     v1=np.sin(angulo)*v[0]+np.cos(angulo)*v[1]
     v2=np.cos(angulo)*v[0]-np.sin(angulo)*v[1]
     return (v1,v2)
+
+
+def eventos(dirX,dirY,posX,posY,angulo,angulo2):
+    for event in pygame.event.get():
+        if event.type == QUIT:
+            sys.exit()
+            return
+        if event.type == pygame.KEYDOWN:
+            if event.key==pygame.K_ESCAPE:
+                sys.exit()
+                return
+            if event.key==pygame.K_RIGHT:
+                posX-=dirX[0]/5
+                posY-=dirX[1]/5
+            if event.key==pygame.K_LEFT:
+                posX+=dirX[0]/5
+                posY+=dirX[1]/5
+            if event.key==pygame.K_UP:
+                posX+=dirY[0]/5
+                posY+=dirY[1]/5
+            if event.key==pygame.K_DOWN:
+                posX-=dirY[0]/5
+                posY-=dirY[1]/5
+            if event.key==pygame.K_2:
+                angulo+=2
+            if event.key==pygame.K_1:
+                angulo-=2
+            if event.key==pygame.K_3:
+                if angulo2<45:
+                    angulo2+=2
+            if event.key==pygame.K_4:
+                if angulo2>-45:
+                    angulo2-=2
+
+    return dirX,dirY,posX,posY,angulo,angulo2
+def glTranslatefv(paso):
+    glTranslate(paso[0],paso[1],paso[2])
 def run():
     pygame.init()
     screen = pygame.display.set_mode(SCREEN_SIZE, HWSURFACE|OPENGL|DOUBLEBUF)
@@ -80,6 +118,7 @@ def run():
 
     clock = pygame.time.Clock()
     tex_rotation = 0.0
+    # dimenciones mapa
     v1=( 300, -10,300)
     v2=( 300, -10,-300)
     v3=( -300,-10 ,-300)
@@ -89,43 +128,16 @@ def run():
     dirX=(1,0)
     dirY=(0,1)
     (posX,posY)=(0,0)
+    # paso a atras de la vista
+    pasoAt=(0,0,-0.5)
+    pasoAd=(0,0,0.5)
+
     madera=cargarImagen("madera.jpg")
     pygame.key.set_repeat(10,10)
     while True:
         dirX=(np.cos(angulo*np.pi/180),np.sin(angulo*np.pi/180))
         dirY=(-np.sin((angulo)*np.pi/180),np.cos((angulo)*np.pi/180))
-        #dirY=(0,1)
-        for event in pygame.event.get():
-            if event.type == QUIT:
-                return
-            if event.type == pygame.KEYDOWN:
-                if event.key==pygame.K_ESCAPE:
-                    return
-                if event.key==pygame.K_RIGHT:
-                    posX-=dirX[0]/5
-                    posY-=dirX[1]/5
-                if event.key==pygame.K_LEFT:
-                    posX+=dirX[0]/5
-                    posY+=dirX[1]/5
-                if event.key==pygame.K_UP:
-                    posX+=dirY[0]/5
-                    posY+=dirY[1]/5
-                if event.key==pygame.K_DOWN:
-                    posX-=dirY[0]/5
-                    posY-=dirY[1]/5
-                if event.key==pygame.K_2:
-                    angulo+=2
-                if event.key==pygame.K_1:
-                    angulo-=2
-                if event.key==pygame.K_3:
-                    if angulo2<45:
-                        angulo2+=2
-                if event.key==pygame.K_4:
-                    if angulo2>-45:
-                        angulo2-=2
-        #time_passed = clock.tick()
-        #time_passed_seconds = time_passed / 1000.
-        #tex_rotation += time_passed_seconds * 360.0 / 8.0
+        dirX,dirY,posX,posY,angulo,angulo2=eventos(dirX,dirY,posX,posY,angulo,angulo2)
         # Clear the screen (similar to fill)
         glClear(GL_COLOR_BUFFER_BIT)
 
@@ -134,25 +146,21 @@ def run():
 
         glRotatef(angulo,0,1,0)
         glRotatef(angulo2,1,0,0)
-        # Set the modelview matrix
-
-        #glRotate(tex_rotation, 1, 0, 0)
-        # Draw a quad (4 vertices, 4 texture coords)
-
-        #glLineWidth(4.0)
-        #glBegin(GL_LINES)
-        #glVertex3f(0,posX,posY)
-        #glVertex3f(0,posX+dirX[0],posY+dirX[1])
-        #glEnd()
+        # mapa
         glTranslatef(posX, 0, posY)
-
         textureCuadrado(madera,v1,v2,v3,v4,30,30)
+        glTranslatef(-posX, 0, -posY)
+        #personajje
 
-        glTranslatef(-posX, 0, -0.5-posY)
+        glTranslatefv((np.sin((-angulo+90)*np.pi/180),0,np.cos((-angulo+90)*np.pi/180)))
         glutSolidCube(0.2)
+        glTranslatefv((np.sin((angulo-90)*np.pi/180),0,np.cos((angulo-90)*np.pi/180)))
 
-        glTranslatef(-5, 10, -5)
-        glRotatef(-angulo,0,1,0)
+
+        glTranslatef(0, 0.0,0.5)
+        glutSolidCube(0.1)
+        #glRotatef(-angulo2,0,0,0)
+        #glTranslatef(-posX, 0, -posY)
 
         #glRotate(-90, 0, 0, 1)
         pygame.display.flip()
