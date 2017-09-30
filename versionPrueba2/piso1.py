@@ -68,11 +68,6 @@ def textureCuadrado(textura,v1,v2,v3,v4,nx,ny):
                     GL_UNSIGNED_BYTE,
                     textura[0])
     cuadrado(v1,v2,v3,v4,nx,ny)
-def rotar(angulo,v ):
-
-    v1=np.sin(angulo)*v[0]+np.cos(angulo)*v[1]
-    v2=np.cos(angulo)*v[0]-np.sin(angulo)*v[1]
-    return (v1,v2)
 
 
 def eventos(dirX,dirY,posX,posY,angulo,angulo2):
@@ -110,31 +105,53 @@ def eventos(dirX,dirY,posX,posY,angulo,angulo2):
     return dirX,dirY,posX,posY,angulo,angulo2
 def glTranslatefv(paso):
     glTranslate(paso[0],paso[1],paso[2])
+def cubo(cara):
+    v11=(-0.25,3,-0.25)
+    v12=(-0.25,3,0.25)
+    v13=(0.25,3,0.25)
+    v14=(0.25,3,-0.25)
+
+    v21=(-0.25,-3,-0.25)
+    v22=(-0.25,-3,0.25)
+    v23=(0.25,-3,0.25)
+    v24=(0.25,-3,-0.25)
+
+
+    textureCuadrado(cara,v11,v12,v13,v14,1,1)
+    textureCuadrado(cara,v21,v22,v23,v24,1,1)
+
+    textureCuadrado(cara,v11,v12,v22,v21,1,6)
+    textureCuadrado(cara,v12,v13,v23,v22,1,6)
+    textureCuadrado(cara,v13,v14,v24,v23,1,6)
+    textureCuadrado(cara,v14,v11,v21,v24,1,6)
 def run():
     pygame.init()
     screen = pygame.display.set_mode(SCREEN_SIZE, HWSURFACE|OPENGL|DOUBLEBUF)
     resize(*SCREEN_SIZE)
     init()
 
-    clock = pygame.time.Clock()
+    #clock = pygame.time.Clock()
     tex_rotation = 0.0
     # dimenciones mapa
-    v1=( 300, -10,300)
-    v2=( 300, -10,-300)
-    v3=( -300,-10 ,-300)
-    v4=( -300,-10, 300)
+    v1=( 300, -3,300)
+    v2=( 300, -3,-300)
+    v3=( -300,-3 ,-300)
+    v4=( -300,-3, 300)
     angulo = 0
     angulo2=0
     dirX=(1,0)
     dirY=(0,1)
-    (posX,posY)=(0,0)
+    (posX,posY)=(300,300)
     # paso a atras de la vista
     pasoAt=(0,0,-0.5)
     pasoAd=(0,0,0.5)
 
     madera=cargarImagen("madera.jpg")
+    akari=cargarImagen("akari2.jpg")
     pygame.key.set_repeat(10,10)
+
     while True:
+
         dirX=(np.cos(angulo*np.pi/180),np.sin(angulo*np.pi/180))
         dirY=(-np.sin((angulo)*np.pi/180),np.cos((angulo)*np.pi/180))
         dirX,dirY,posX,posY,angulo,angulo2=eventos(dirX,dirY,posX,posY,angulo,angulo2)
@@ -143,22 +160,48 @@ def run():
 
         # Clear the modelview matrix
         glLoadIdentity()
+        #glTranslatef(0.0,0.0,-1.0)
+        #glRotatef(90,1,0,0)
 
-        glRotatef(angulo,0,1,0)
+
         glRotatef(angulo2,1,0,0)
+        glPushMatrix()
+
+
+
+
+        glTranslatef(0.0,0.0,-2.0)
+        glRotatef(angulo,0,1,0)
+
+        #
         # mapa
+        glPushMatrix()
         glTranslatef(posX, 0, posY)
         textureCuadrado(madera,v1,v2,v3,v4,30,30)
-        glTranslatef(-posX, 0, -posY)
+        glPopMatrix()
+        glPopMatrix()
+        glTranslatef(0.0,0.0,-2.0)
+
+        cubo(akari)
+
+        #glTranslatef(-posX, 0, -posY)
         #personajje
+        #glTranslatefv((np.sin((angulo)*np.pi/180),0,1-np.cos((angulo)*np.pi/180)))
 
-        glTranslatefv((np.sin((-angulo+90)*np.pi/180),0,np.cos((-angulo+90)*np.pi/180)))
-        glutSolidCube(0.2)
-        glTranslatefv((np.sin((angulo-90)*np.pi/180),0,np.cos((angulo-90)*np.pi/180)))
+        #glTranslatef(0.0,0.0,-1.0)
+        #glRotatef(-angulo,0,1,0)
+        #glPushMatrix()
+
+        #glTranslatef(0, 0.0,-2)
 
 
-        glTranslatef(0, 0.0,0.5)
-        glutSolidCube(0.1)
+        #glPopMatrix()
+
+
+
+
+        #glTranslatef(0, 0.0,0.5)
+        #glutSolidCube(0.1)
         #glRotatef(-angulo2,0,0,0)
         #glTranslatef(-posX, 0, -posY)
 
