@@ -105,7 +105,7 @@ def eventos(dirX,dirY,posX,posY,angulo,angulo2):
     return dirX,dirY,posX,posY,angulo,angulo2
 def glTranslatefv(paso):
     glTranslate(paso[0],paso[1],paso[2])
-def cubo(cara):
+def cubo6(cara):
     v11=(-0.25,3,-0.25)
     v12=(-0.25,3,0.25)
     v13=(0.25,3,0.25)
@@ -116,7 +116,6 @@ def cubo(cara):
     v23=(0.25,-3,0.25)
     v24=(0.25,-3,-0.25)
 
-
     textureCuadrado(cara,v11,v12,v13,v14,1,1)
     textureCuadrado(cara,v21,v22,v23,v24,1,1)
 
@@ -124,6 +123,130 @@ def cubo(cara):
     textureCuadrado(cara,v12,v13,v23,v22,1,6)
     textureCuadrado(cara,v13,v14,v24,v23,1,6)
     textureCuadrado(cara,v14,v11,v21,v24,1,6)
+
+def cubo(lado,textura):
+    v11=(-lado/2,lado/2*6,-lado/2)
+    v12=(-lado/2,lado/2*6,lado/2)
+    v13=(lado/2,lado/2*6,lado/2)
+    v14=(lado/2,lado/2*3,-lado/2)
+
+    v21=(-lado/2,-lado/2*6,-lado/2)
+    v22=(-lado/2,-lado/2*6,lado/2)
+    v23=(lado/2,-lado/2*6,lado/2)
+    v24=(lado/2,-lado/2*6,-lado/2)
+
+    textureCuadrado(textura,v11,v12,v13,v14,1,1)
+    textureCuadrado(textura,v21,v22,v23,v24,1,1)
+
+    textureCuadrado(textura,v11,v12,v22,v21,1,6)
+    textureCuadrado(textura,v12,v13,v23,v22,1,6)
+    textureCuadrado(textura,v13,v14,v24,v23,1,6)
+    textureCuadrado(textura,v14,v11,v21,v24,1,6)
+
+
+def columna(total,lado,altura,textura):
+    total=5
+    glTranslate(0,-altura,0)
+    for i in range(0,6):
+        glTranslate(0,lado,0)
+        cubo(lado,textura)
+    glTranslate(0,altura-lado*6,0)
+
+def mapa(total,lado,altura,textura):
+
+    m=np.array([[1,1,1,1,1,1],
+               [1,0,0,0,0,1],
+               [1,0,1,1,0,1],
+               [1,0,1,1,0,1],
+               [1,0,0,0,0,1],
+               [1,1,1,1,1,1]])
+    largo=len(m[0,:])
+    ancho=len(m[:,0])
+    glTranslate(0,0,-total)
+    glTranslate(-total,0,0)
+    for i in range (0,largo):
+        glTranslate(0,0,lado*2)
+        for j in range (0,ancho):
+            glTranslate(lado*2,0,0)
+            if m[i,j]==1:
+                glTranslate(0,3*lado,0)
+                cubo(lado,textura)
+                glTranslate(0,-3*lado,0)
+                #columna(total,lado,altura,textura)
+        glTranslate(-lado*ancho*2,0,0)
+    glTranslate(0,0,-lado*largo*2)
+
+def mapa2(total,lado,altura,textura):
+    m=np.array([[1,1,1,1,1,1],
+                [0,0,0,0,0,0],
+                [0,0,1,1,0,0],
+                [0,0,1,1,0,0],
+                [0,0,0,0,0,0],
+                [1,1,1,1,1,1],
+                [0,0,0,0,0,0],
+                [1,1,1,1,1,1],
+                [0,0,0,0,0,0],
+                [0,0,1,1,0,0],
+                [0,0,1,1,0,0],
+                [0,0,0,0,0,0],
+                [1,1,1,1,1,1]
+                ])
+
+
+    largo=len(m[0,:])
+    ancho=len(m[:,0])
+
+    glTranslate(0,0,-total)
+    glTranslate(-total,0,0)
+    glTranslate(0,-3,0)
+
+    for i in range (0,ancho):
+        inicio=0
+        for j in range (0,largo):
+            if (m[i,j]>0 and inicio==0):
+                v1=(i*lado*2+lado,0,j*lado*2+lado)
+                v2=(i*lado*2+lado,6,j*lado*2+lado)
+                inicio=1
+            if ((j+1==largo or m[i,j+1]==0) and inicio==1):
+                v3=(i*lado*2+lado,0,j*lado*2+lado)
+                v4=(i*lado*2+lado,6,j*lado*2+lado)
+                inicio=0
+                #print "cuandrado"
+                textureCuadrado(textura,v2,v1,v3,v4,1,6)
+
+
+    m=np.array([[1,0,0,0,0,0],
+                [1,0,0,0,0,1],
+                [1,0,1,1,0,1],
+                [1,0,1,1,0,1],
+                [1,0,0,0,0,1],
+                [1,0,0,0,0,1],
+                [0,0,0,0,0,0],
+                [1,0,0,0,0,0],
+                [1,0,0,0,0,1],
+                [1,0,1,1,0,1],
+                [1,0,1,1,0,1],
+                [1,0,0,0,0,1],
+                [1,0,0,0,0,1]
+                ])
+
+    for j in range (0,largo):
+        inicio=0
+        for i in range (0,ancho):
+            if (m[i,j]>0 and inicio==0):
+                v1=(i*lado*2+lado,0,j*lado*2+lado)
+                v2=(i*lado*2+lado,6,j*lado*2+lado)
+                inicio=1
+            if ((i+1==ancho or m[i+1,j]==0) and inicio==1):
+                v3=(i*lado*2+lado,0,j*lado*2+lado)
+                v4=(i*lado*2+lado,6,j*lado*2+lado)
+                inicio=0
+                #print "cuandrado"
+                textureCuadrado(textura,v2,v1,v3,v4,1,6)
+
+
+
+
 def run():
     pygame.init()
     screen = pygame.display.set_mode(SCREEN_SIZE, HWSURFACE|OPENGL|DOUBLEBUF)
@@ -132,22 +255,27 @@ def run():
 
     #clock = pygame.time.Clock()
     tex_rotation = 0.0
+
+    total=40
+    alto=3
     # dimenciones mapa
-    v1=( 300, -3,300)
-    v2=( 300, -3,-300)
-    v3=( -300,-3 ,-300)
-    v4=( -300,-3, 300)
+    v1=( total, -alto,total)
+    v2=( total, -alto,-total)
+    v3=( -total,-alto ,-total)
+    v4=( -total,-alto, total)
     angulo = 0
     angulo2=0
     dirX=(1,0)
     dirY=(0,1)
-    (posX,posY)=(300,300)
+    (posX,posY)=(total,total)
     # paso a atras de la vista
     pasoAt=(0,0,-0.5)
     pasoAd=(0,0,0.5)
 
     madera=cargarImagen("madera.jpg")
+    pared=cargarImagen("pared.jpg")
     akari=cargarImagen("akari2.jpg")
+
     pygame.key.set_repeat(10,10)
 
     while True:
@@ -177,12 +305,14 @@ def run():
         # mapa
         glPushMatrix()
         glTranslatef(posX, 0, posY)
+
         textureCuadrado(madera,v1,v2,v3,v4,30,30)
+        mapa2(total,1,alto-1,pared)
         glPopMatrix()
         glPopMatrix()
         glTranslatef(0.0,0.0,-2.0)
 
-        cubo(akari)
+        cubo6(akari)
 
         #glTranslatef(-posX, 0, -posY)
         #personajje
